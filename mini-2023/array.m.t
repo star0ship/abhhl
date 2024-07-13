@@ -1,0 +1,123 @@
+	# head
+	LOD R2,STACK
+	STO (R2),0
+	LOD R4,EXIT
+	STO (R2+4),R4
+
+	# label main
+main:
+
+	# begin
+
+	# array a
+
+	# a[3] = 7
+	LOD R5,3
+	LOD R6,(R2+8)
+	LOD R6,R2
+	ADD R6,8
+	MUL R5,4
+	ADD R5,R6
+	LOD R7,7
+	STO (R5),R7
+
+	# a[7] = 6
+	LOD R8,7
+	LOD R6,R2
+	ADD R6,8
+	MUL R8,4
+	ADD R8,R6
+	LOD R9,6
+	STO (R8),R9
+
+	# var t0
+
+	# t0 = a[3]
+	LOD R10,3
+	MUL R10,4
+	ADD R10,R6
+	LOD R10,(R10)
+	STO (R2+48),R10
+
+	# var t1
+
+	# t1 = a[t0]
+	LOD R11,(R2+48)
+	MUL R11,4
+	ADD R11,R6
+	LOD R11,(R11)
+	STO (R2+52),R11
+
+	# actual t1
+	LOD R12,(R2+52)
+	STO (R2+56),R12
+
+	# call PRINTN
+	STO (R2+60),R2
+	LOD R4,R1+32
+	STO (R2+64),R4
+	LOD R2,R2+60
+	JMP PRINTN
+
+	# end
+	LOD R3,(R2+4)
+	LOD R2,(R2)
+	JMP R3
+
+PRINTN:
+	LOD R7,(R2-4) # 789
+	LOD R15,R7 # 789 
+	DIV R7,10 # 78
+	TST R7
+	JEZ PRINTDIGIT
+	LOD R8,R7 # 78
+	MUL R8,10 # 780
+	SUB R15,R8 # 9
+	STO (R2+8),R15 # local 9 store
+
+	# out 78
+	STO (R2+12),R7 # actual 78 push
+
+	# call PRINTN
+	STO (R2+16),R2
+	LOD R4,R1+32
+	STO (R2+20),R4
+	LOD R2,R2+16
+	JMP PRINTN
+
+	# out 9
+	LOD R15,(R2+8) # local 9 
+
+PRINTDIGIT:
+	ADD  R15,48
+	OUT
+
+	# ret
+	LOD R3,(R2+4)
+	LOD R2,(R2)
+	JMP R3
+
+PRINTS:
+	LOD R7,(R2-4)
+
+PRINTC:
+	LOD R15,(R7)
+	DIV R15,16777216
+	TST R15
+	JEZ PRINTSEND
+	OUT
+	ADD R7,1
+	JMP PRINTC
+
+PRINTSEND:
+	# ret
+	LOD R3,(R2+4)
+	LOD R2,(R2)
+	JMP R3
+
+EXIT:
+	END
+
+STATIC:
+	DBN 0,0
+STACK:
